@@ -12,6 +12,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.mozilla.fenix.helpers.AndroidAssetDispatcher
 import org.mozilla.fenix.helpers.HomeActivityIntentTestRule
+import org.mozilla.fenix.helpers.MockLocationTestHelper
+import org.mozilla.fenix.helpers.TestHelper
 import org.mozilla.fenix.ui.robots.navigationToolbar
 
 /**
@@ -28,7 +30,7 @@ class SitePermissionsTest {
     var mGrantPermissions = GrantPermissionRule.grant(
         android.Manifest.permission.CAMERA,
         android.Manifest.permission.RECORD_AUDIO,
-        android.Manifest.permission.ACCESS_COARSE_LOCATION
+        android.Manifest.permission.ACCESS_FINE_LOCATION
     )
 
     @Before
@@ -37,6 +39,8 @@ class SitePermissionsTest {
             dispatcher = AndroidAssetDispatcher()
             start()
         }
+        TestHelper.allowMockLocation()
+        MockLocationTestHelper.mockLocation()
     }
 
     @Test

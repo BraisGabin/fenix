@@ -5,6 +5,7 @@
 package org.mozilla.fenix.helpers
 
 import android.app.PendingIntent
+import android.app.UiAutomation
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -26,13 +27,7 @@ import androidx.test.espresso.intent.matcher.IntentMatchers
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.platform.app.InstrumentationRegistry
-import androidx.test.uiautomator.By
-import androidx.test.uiautomator.UiDevice
-import androidx.test.uiautomator.UiObject
-import androidx.test.uiautomator.UiScrollable
-import androidx.test.uiautomator.UiSelector
-import androidx.test.uiautomator.Until
-import java.io.File
+import androidx.test.uiautomator.*
 import kotlinx.coroutines.runBlocking
 import mozilla.components.support.ktx.android.content.appName
 import org.hamcrest.CoreMatchers
@@ -43,6 +38,8 @@ import org.mozilla.fenix.helpers.TestAssetHelper.waitingTime
 import org.mozilla.fenix.helpers.ext.waitNotNull
 import org.mozilla.fenix.helpers.idlingresource.NetworkConnectionIdlingResource
 import org.mozilla.fenix.ui.robots.mDevice
+import java.io.File
+import java.io.FileInputStream
 
 object TestHelper {
 
@@ -222,5 +219,19 @@ object TestHelper {
     fun UiDevice.waitForObjects(obj: UiObject, waitingTime: Long = TestAssetHelper.waitingTime) {
         this.waitForIdle()
         Assert.assertNotNull(obj.waitForExists(waitingTime))
+    }
+
+    // Setting the mock location app for get location testing
+    fun allowMockLocation() {
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        instrumentation.uiAutomation.executeShellCommandBlocking(
+            "appops set ${appContext.packageName} android:mock_location allow"
+        )
+    }
+
+    // a custom function which waits for the appops command to complete.
+    fun UiAutomation.executeShellCommandBlocking(command: String) {
+        val output = executeShellCommand(command)
+        FileInputStream(output.fileDescriptor).use { it.readBytes() }
     }
 }
